@@ -27,6 +27,7 @@ import (
 	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -313,6 +314,10 @@ func Dockerfile2LLB(ctx context.Context, dt []byte, opt ConvertOpt) (*llb.State,
 		for _, env := range d.image.Config.Env {
 			k, v := parseKeyValue(env)
 			d.state = d.state.AddEnv(k, v)
+		}
+		if val, ok := opt.BuildArgs["HOSTNAME"]; ok {
+			d.state = d.state.Hostname(val)
+			logrus.Infof("1301: Dockerfile2LLB d.state.Hostname with HOSTNAME=%v, then d.state: %#v", val, d.state)
 		}
 		if d.image.Config.WorkingDir != "" {
 			if err = dispatchWorkdir(d, &instructions.WorkdirCommand{Path: d.image.Config.WorkingDir}, false, nil); err != nil {

@@ -55,8 +55,9 @@ message Meta {
 	repeated string env = 2;
 	string cwd = 3;
 	string user = 4;
-	ProxyEnv proxy_env = 5;
-	repeated HostIP extraHosts = 6;
+	string hostname = 5;
+	ProxyEnv proxy_env = 6;
+	repeated HostIP extraHosts = 7;
 }
 
 enum NetMode {

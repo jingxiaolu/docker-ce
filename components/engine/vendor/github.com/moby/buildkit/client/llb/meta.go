@@ -18,6 +18,7 @@ var (
 	keyDir       = contextKeyT("llb.exec.dir")
 	keyEnv       = contextKeyT("llb.exec.env")
 	keyUser      = contextKeyT("llb.exec.user")
+	keyHostname  = contextKeyT("llb.exec.hostname")
 	keyExtraHost = contextKeyT("llb.exec.extrahost")
 	keyPlatform  = contextKeyT("llb.platform")
 	keyNetwork   = contextKeyT("llb.network")
@@ -93,6 +94,20 @@ func getArgs(s State) []string {
 
 func getUser(s State) string {
 	v := s.Value(keyUser)
+	if v != nil {
+		return v.(string)
+	}
+	return ""
+}
+
+func hostname(str string) StateOption {
+	return func(s State) State {
+		return s.WithValue(keyHostname, str)
+	}
+}
+
+func getHostname(s State) string {
+	v := s.Value(keyHostname)
 	if v != nil {
 		return v.(string)
 	}

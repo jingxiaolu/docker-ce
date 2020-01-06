@@ -693,6 +693,7 @@ func (e *execOp) Exec(ctx context.Context, inputs []solver.Result) ([]solver.Res
 		Env:            e.op.Meta.Env,
 		Cwd:            e.op.Meta.Cwd,
 		User:           e.op.Meta.User,
+		Hostname:       e.op.Meta.Hostname,
 		ReadonlyRootFS: readonlyRootFS,
 		ExtraHosts:     extraHosts,
 		NetMode:        e.op.Network,

@@ -211,6 +211,7 @@ func (s State) Run(ro ...RunOption) ExecState {
 		Cwd:        getDir(ei.State),
 		Env:        getEnv(ei.State),
 		User:       getUser(ei.State),
+		Hostname:   getHostname(ei.State),
 		ProxyEnv:   ei.ProxyEnv,
 		ExtraHosts: getExtraHosts(ei.State),
 		Network:    getNetwork(ei.State),
@@ -276,6 +277,14 @@ func (s State) Reset(s2 State) State {
 
 func (s State) User(v string) State {
 	return user(v)(s)
+}
+
+func (s State) Hostname(v string) State {
+	return hostname(v)(s)
+}
+
+func (s State) GetHostname() string {
+	return getHostname(s)
 }
 
 func (s State) Platform(p specs.Platform) State {

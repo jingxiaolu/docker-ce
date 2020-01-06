@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/moby/buildkit/executor"
@@ -18,10 +19,10 @@ const hostsContent = `
 ::1	localhost ip6-localhost ip6-loopback
 `
 
-func GetHostsFile(ctx context.Context, stateDir string, extraHosts []executor.HostIP, idmap *idtools.IdentityMapping) (string, func(), error) {
+func GetHostsFile(ctx context.Context, stateDir string, extraHosts []executor.HostIP, idmap *idtools.IdentityMapping, hostname string) (string, func(), error) {
 	if len(extraHosts) == 0 {
 		_, err := g.Do(ctx, stateDir, func(ctx context.Context) (interface{}, error) {
-			_, _, err := makeHostsFile(stateDir, nil, idmap)
+			_, _, err := makeHostsFile(stateDir, nil, idmap, hostname)
 			return nil, err
 		})
 		if err != nil {
@@ -29,10 +30,10 @@ func GetHostsFile(ctx context.Context, stateDir string, extraHosts []executor.Ho
 		}
 		return filepath.Join(stateDir, "hosts"), func() {}, nil
 	}
-	return makeHostsFile(stateDir, extraHosts, idmap)
+	return makeHostsFile(stateDir, extraHosts, idmap, hostname)
 }
 
-func makeHostsFile(stateDir string, extraHosts []executor.HostIP, idmap *idtools.IdentityMapping) (string, func(), error) {
+func makeHostsFile(stateDir string, extraHosts []executor.HostIP, idmap *idtools.IdentityMapping, hostname string) (string, func(), error) {
 	p := filepath.Join(stateDir, "hosts")
 	if len(extraHosts) != 0 {
 		p += "." + identity.NewID()
@@ -47,7 +48,11 @@ func makeHostsFile(stateDir string, extraHosts []executor.HostIP, idmap *idtools
 
 	b := &bytes.Buffer{}
 
-	if _, err := b.Write([]byte(hostsContent)); err != nil {
+	var hosts = hostsContent
+	if hostname != "" {
+		hosts = strings.Replace(hosts, "buildkitsandbox", hostname, 1)
+	}
+	if _, err := b.Write([]byte(hosts)); err != nil {
 		return "", nil, err
 	}
 

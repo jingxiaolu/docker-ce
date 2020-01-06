@@ -17,6 +17,7 @@ type Meta struct {
 	Env        EnvList
 	Cwd        string
 	User       string
+	Hostname   string
 	ProxyEnv   *ProxyEnv
 	ExtraHosts []HostIP
 	Network    pb.NetMode
@@ -155,10 +156,11 @@ func (e *ExecOp) Marshal(c *Constraints) (digest.Digest, []byte, *pb.OpMetadata,
 	}
 
 	meta := &pb.Meta{
-		Args: e.meta.Args,
-		Env:  e.meta.Env.ToArray(),
-		Cwd:  e.meta.Cwd,
-		User: e.meta.User,
+		Args:     e.meta.Args,
+		Env:      e.meta.Env.ToArray(),
+		Cwd:      e.meta.Cwd,
+		User:     e.meta.User,
+		Hostname: e.meta.Hostname,
 	}
 	if len(e.meta.ExtraHosts) > 0 {
 		hosts := make([]*pb.HostIP, len(e.meta.ExtraHosts))

@@ -23,6 +23,7 @@ import (
 	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // Ideally we don't have to import whole containerd just for the default spec
@@ -65,7 +66,12 @@ func GenerateSpec(ctx context.Context, meta executor.Meta, mounts []executor.Mou
 	s.Process.Cwd = meta.Cwd
 	s.Process.Rlimits = nil           // reset open files limit
 	s.Process.NoNewPrivileges = false // reset nonewprivileges
+
 	s.Hostname = "buildkitsandbox"
+	if meta.Hostname != "" {
+		s.Hostname = meta.Hostname
+	}
+	logrus.Infof("1301: GenerateSpec with s.Hostname: %v, meta.Hostname: %v, meta.Env: %v", s.Hostname, meta.Hostname, meta.Env)
 
 	s.Mounts, err = GetMounts(ctx,
 		withProcessMode(processMode),
